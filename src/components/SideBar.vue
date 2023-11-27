@@ -27,13 +27,11 @@ export default {
     return {
       links: [
         ["mdi-home-outline", "Dashboard","/dashboard"],
-        ["mdi-cube-outline", "Products",,"/dashboard"],
+        ["mdi-cube-outline", "Products","/products"],
         ["mdi-database", "Orders","/orders"],
         ["mdi-arrow-top-right", "Shipments","/shipments"],
-        ["mdi-account", "Suppliers",,"/dashboard"],
-        ["mdi-account-switch", "Customers",,"/dashboard"],
-        ["mdi-chart-bar", "Reports",,"/dashboard"],
-        ["mdi-cog", "Settings",,"/dashboard"],
+        ["mdi-account", "Suppliers","/suppliers"],
+        ["mdi-account-switch", "Customers","/customers"],
       ],
     };
   },

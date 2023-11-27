@@ -12,7 +12,6 @@
                     <h6 class="text-center grey--text">
                       Log in to your account so you can continue
                     </h6>
-                    <v-alert class="alert alert-danger" v-if="error">{{ error }}</v-alert>
                     <v-row align="center" justify="center">
                       <v-col cols="12" sm="8">
                         <v-text-field
@@ -22,9 +21,8 @@
                           color="blue"
                           autocomplete="false"
                           class="mt-6"
-                          v-model.trim="email"
+                          v-model="data.email"
                         ></v-text-field>
-                        <div class="error" v-if="errors.email">{{ errors.email }}</div>
                         <v-text-field
                           label="Password"
                           outlined
@@ -32,9 +30,8 @@
                           color="blue"
                           autocomplete="false"
                           type="password"
-                          v-model.trim="password"
+                          v-model="data.password"
                         ></v-text-field>
-                        <div class="error" v-if="errors.password">{{ errors.password }}</div>
                         <v-row>
                           <v-col cols="12" sm="7">
                             <v-checkbox
@@ -49,7 +46,9 @@
                             >
                           </v-col>
                         </v-row>
-                        <v-btn color="blue" dark block tile @click="onLogin()">Login</v-btn>
+                          <v-btn color="blue" dark block tile @click="submit()"
+                            >Login</v-btn
+                          >
                       </v-col>
                     </v-row>
                   </v-card-text>
@@ -65,7 +64,9 @@
                       </h6>
                     </v-card-text>
                     <div class="text-center">
-                      <v-btn tile outlined dark :to="{name: 'Signup'}">SIGN UP</v-btn>
+                      <v-btn tile outlined dark :to="{ name: 'Signup' }"
+                        >SIGN UP</v-btn
+                      >
                     </div>
                   </div>
                 </v-col>
@@ -78,52 +79,45 @@
   </v-container>
 </template>
 
-<script>
-import {
-  LOADING_SPINNER_SHOW_MUTATION,
-  LOGIN_ACTION,
-} from "@/store/storeconstants";
-import { mapActions, mapMutations } from "vuex";
-import SignupValidations from "../services/SignupValidations";
+<script lang="ts">
+import {  reactive } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from 'vuex';
+
+
 export default {
-  data() {
-    return {
+  name: "Login",
+  setup() {
+    const store = useStore();
+    const data = reactive({
       email: "",
       password: "",
-      errors: [],
-      error: "",
-    };
-  },
-  methods: {
-    ...mapActions("auth", {
-      login: LOGIN_ACTION,
-    }),
+    });
 
-    ...mapMutations({
-      showLoading: LOADING_SPINNER_SHOW_MUTATION,
-    }),
-
-    async onLogin() {
-      let validations = new SignupValidations(this.email, this.password);
-
-      this.errors = validations.checkValidations();
-      if (
-        this.errors &&
-        ("email" in this.errors || "password" in this.errors)
-      ) {
-        return false;
-      }
-      this.error = "";
-      this.showLoading(true);
+    const router = useRouter();
+    const submit = async () => {
       try {
-        await this.login({ email: this.email, password: this.password });
-        this.$router.push('/dashboard');
-      } catch (e) {
-        this.error = e;
-        this.showLoading(false);
+        const response = await fetch("http://localhost:8000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(data),
+        });
+        store.dispatch('setAuth', true);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Process the response as needed
+      } catch (error) {
+        console.error("Fetch error:", error);
       }
-      this.showLoading(false);
-    },
+      await router.push("/dashboard");
+    };
+    return {
+      data,
+      submit,
+    };
   },
 };
 </script>

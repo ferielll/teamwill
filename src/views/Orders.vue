@@ -33,12 +33,12 @@
                       <th :style="{ 'font-weight': 'bold' }">Customer ID</th>
                       <th></th>
                     </tr>
-                    <tr v-for="item in orders" :key="item.name">
+                    <tr v-for="order in result" :key="order._id">
                       <td :style="{ 'font-weight': 'bold', color: '#2F4F4F' }">
-                        {{ item.order }}
+                        {{ order.order }}
                       </td>
                       <td :style="{ 'font-weight': 'bold', color: '#2F4F4F' }">
-                        {{ item.customerID }}
+                        {{ order.customerID }}
                       </td>
                       <td>
                         <v-row justify="space-around">
@@ -57,7 +57,7 @@
                                   View Details
                                 </v-btn>
                               </template>
-                              <template v-slot:default="{ isActive }">
+                              <template v-slot:default="">
                                 <v-card>
                                   <v-toolbar color="rgb(75, 192, 192)">
                                     <v-toolbar-title style="font-weight: bold"
@@ -67,16 +67,16 @@
                                   <v-list lines="two" subheader>
                                     <v-list-item
                                       title="Num Order"
-                                      :subtitle="item.order"
+                                      :subtitle="order.order"
                                     ></v-list-item>
                                     <v-list-item
                                       title="Customer ID"
-                                      :subtitle="item.customerID"
+                                      :subtitle="order.customerID"
                                     ></v-list-item>
                                     <v-list-item @click="showDialog = true">
                                       <div style="text-align: center">
                                         <img
-                                          src="pc-portable.jpg"
+                                          :src="`http://localhost:8000/static/`+order.product.image"
                                           alt="Image"
                                           style="
                                             width: 200px;
@@ -99,7 +99,7 @@
                                         <v-card-text>
                                           <div style="text-align: center">
                                             <img
-                                              src="pc-portable.jpg"
+                                              :src="`http://localhost:8000/static/`+order.product.image"
                                               alt="Image"
                                               style="
                                                 width: 200px;
@@ -113,11 +113,11 @@
                                         <v-list lines="two" subheader>
                                           <v-list-item
                                             title="Product ID"
-                                            :subtitle="'#187844'"
+                                            :subtitle="order.product.id"
                                           ></v-list-item>
                                           <v-list-item
                                             title="Quantity"
-                                            :subtitle="'100'"
+                                            :subtitle="order.product.quantity"
                                           ></v-list-item>
                                         </v-list>
                                         <v-card-actions>
@@ -130,21 +130,14 @@
                                       </v-card>
                                     </v-dialog>
                                   </v-list>
-                                  <v-card-actions
-                                    class="d-flex justify-space-between align-center"
+                                  <v-card-actions>
+                                    <v-btn
+                                    color="danger"
+                                    class="rounded-lg"
+                                    @click="remove(order)"
                                   >
-                                    <v-btn
-                                      variant="text"
-                                      @click="isActive.value = false"
-                                      color="success"
-                                      >Approve</v-btn
-                                    >
-                                    <v-btn
-                                      variant="text"
-                                      @click="isActive.value = false"
-                                      color="danger"
-                                      >Reject</v-btn
-                                    >
+                                    Reject Order
+                                  </v-btn>
                                   </v-card-actions>
                                 </v-card>
                               </template>
@@ -169,6 +162,8 @@ import SideBar from "@/components/SideBar.vue";
 import AppBar from "@/components/AppBar.vue";
 import Chart from "chart.js/auto";
 import { VDataTable } from "vuetify/labs/VDataTable";
+import axios from "axios";
+
 export default {
   components: { VDataTable, Chart, SideBar, AppBar },
   data() {
@@ -176,51 +171,42 @@ export default {
       dialogm1: "",
       dialog: false,
       showDialog: false,
-      orders: [
-        {
-          order: "#29965-98",
-          customerID: "AZFGY 9875",
-        },
-        {
-          order: "#8795-487",
-          customerID: "AZFGY 9875",
-        },
-        {
-          order: "#8975-321",
-          customerID: "AZFGY 9875",
-        },
-        {
-          order: "#7854-25",
-          customerID: "TREC 5412",
-        },
-        {
-          order: "#74123-96",
-          customerID: "WCVR 89521",
-        },
-        {
-          order: "#1111-87",
-          customerID: "AZDGY 30258",
-        },
-        {
-          order: "#5461-65",
-          customerID: "LRMOE 9867",
-        },
-        {
-          order: "#5461-65",
-          customerID: "ERTVC 54",
-        },
-        {
-          order: "#5461-65",
-          customerID: "UIONH 87",
-        },
-        {
-          order: "#5461-65",
-          customerID: "ZEDT 77",
-        },
-      ],
+      rowStatus: {},
+      result: [],
+      order: {
+        _id: "",
+        order: "",
+        customerID: "",
+        product: ""
+      },
     };
   },
+  created() {
+    this.OrderLoad();
+  },
   mounted() {
+    console.log("mounted() called.......");
+  },
+  methods: {
+    async OrderLoad() {
+      try {
+        const response = await axios.get("http://localhost:8000/api/orders");
+        console.log(this.result);
+        this.result = response.data;
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    remove(order) {
+      var url = `http://localhost:8000/api/order/${order._id}`;
+      axios.delete(url);
+      alert("ORDER REJECTED");
+      this.OrderLoad();
+    },
+  },
+  mounted() {
+    console.log("mounted() called.......");
     const chart = new Chart(document.getElementById("acquisitions"), {
       type: "line",
       data: {
@@ -255,6 +241,15 @@ export default {
 
 <style scoped>
 .rounded-dialog .v-dialog {
-  border-radius: 10px; /* Adjust the border-radius value as needed */
+  border-radius: 10px;
+}
+.green-row {
+  background-color: green;
+  color: white;
+}
+
+.red-row {
+  background-color: red;
+  color: white;
 }
 </style>

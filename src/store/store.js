@@ -1,21 +1,20 @@
 import { createStore } from "vuex";
-import auth from "./modules/auth/index";
-import { LOADING_SPINNER_SHOW_MUTATION } from "./storeconstants";
 
-const store = createStore({
-    modules: {
-        auth,
-    },
-    state() {
-        return {
-            showLoading: false,
-        }
+export default createStore ({
+    state: {
+        authenticated: false
     },
     mutations: {
-        [LOADING_SPINNER_SHOW_MUTATION](state,payload) {
-            state.showLoading = payload;
-        }
-    }
-});
+        SET_AUTH(state, auth) {
+            state.authenticated = auth;
+          },
+    },
+    actions: {
+        setAuth({ commit }, auth) {
+            commit('SET_AUTH', auth);
+          },
+    },
+    modules: {
 
-export default store ; 
+    }
+})

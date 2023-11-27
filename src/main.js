@@ -10,12 +10,14 @@ import router from './router/index'
 import 'vuetify/dist/vuetify.css'
 
 
+
 // Composables
 import { createApp } from 'vue'
 
 // Plugins
 import { registerPlugins } from '@/plugins'
-import store from './store/store'
+import store from '@/store/store';
+
 
 const app = createApp(App)
 

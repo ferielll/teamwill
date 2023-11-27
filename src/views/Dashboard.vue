@@ -6,7 +6,9 @@
       <div class="dashboard">
         <v-subheader class="d-flex justify-space-between align-center">
           <h3 style="font-weight: bold; font-size: 35px">Dashboard</h3>
-          <v-btn color="success" class="rounded-lg" :to="{name: 'Orders'}"> View orders </v-btn>
+          <v-btn color="success" class="rounded-lg" :to="{ name: 'Orders' }">
+            View orders
+          </v-btn>
         </v-subheader>
         <v-row>
           <v-col cols="12" sm="7">
@@ -16,16 +18,25 @@
               style="border: 2px solid #006400"
             >
               <strong style="color: #006400; display: inline"
-                >Login Successfully:
+                >{{ message }}
               </strong>
               <div style="color: #006400; display: inline">Good Morning</div>
             </v-alert>
             <br />
             <v-card elevation="4" class="rounded-lg">
-              <v-card-title
-                style="font-weight: bold; font-size: 30px; color: #2f4f4f"
-                >Shipments</v-card-title
-              >
+              <div class="d-flex justify-space-between align-center">
+                <v-card-title
+                  style="font-weight: bold; font-size: 30px; color: #2f4f4f"
+                  >Shipments</v-card-title
+                >
+                <v-btn
+                  color="success"
+                  class="rounded-lg btn-small"
+                  :to="{ name: 'Products' }"
+                >
+                  View products
+                </v-btn>
+              </div>
               <v-row
                 class="py-4"
                 style="
@@ -228,7 +239,7 @@
                   color="success"
                   class="rounded-lg"
                   style="font-weight: bold"
-                  :to="{name: 'Shipments'}"
+                  :to="{ name: 'Shipments' }"
                 >
                   View All
                 </v-btn>
@@ -279,10 +290,32 @@ import { VDataTable } from "vuetify/labs/VDataTable";
 import SideBar from "@/components/SideBar.vue";
 import AppBar from "@/components/AppBar.vue";
 import Chart from "chart.js/auto";
-
+import { onMounted, ref } from "vue";
 export default {
   name: "Dashboard",
   components: { Chart, SideBar, AppBar },
+  setup() {
+    const message = ref("You are not logged in!");
+
+    onMounted(async () => {
+
+      const response = await fetch("localhost:8000/api/user", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      const content = await response.json();
+
+      //message.value = `Hi ${content.name}`;
+
+     
+    }); 
+
+    return {
+      message,
+    };
+  },
   data() {
     return {
       events: [],
@@ -351,10 +384,10 @@ export default {
         {
           product: "#5461-65",
           shipper: "Amazon",
-          status: "Approved",
+          status: "Pending",
           customer: "Debra",
           customer_id: "AZFGY 9875",
-          color: "#66CDAA",
+          color: "grey",
         },
       ],
     };

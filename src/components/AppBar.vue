@@ -73,9 +73,13 @@
         <template v-slot:prepend>
           <v-icon :icon="item.icon"></v-icon>
         </template>
-
-        <v-list-item-title> {{item.text}}</v-list-item-title>
+        <v-list-item-title> 
+          {{item.text}}
+        </v-list-item-title>
       </v-list-item>
+      <div class= "centered-container">
+        <v-btn class="expanded-button" color="green" dark  tile @click="logout()" :to="{name: 'Login'}">logout</v-btn>
+      </div>
     </v-list>
   </v-card>
     </v-menu>
@@ -85,12 +89,22 @@
 
 <script>
 export default {
+  setup() {
+    const logout = async() => {
+      await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include'
+      })
+    }
+    return {
+      logout
+    }
+  },
   data: () => ({
     menus: [
       {text: "Profile", icon: "mdi-account"},
       {text: "Change Password", icon: "mdi-key"},
-      {text: "Setting", icon: "mdi-cog"},
-      {text: "Logout", icon: "mdi-logout"},
       ],
     items: [
       { type: "subheader", title: "Today" },
@@ -163,7 +177,19 @@ export default {
 }
 
 .custom-title {
-  font-size: 18px; /* Adjust the font size as needed */
-  /* Add any other desired styling properties here */
+  font-size: 18px; 
+}
+
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.expanded-button {
+  width: 200px; 
+  height: 40px;
+  font-size: 15px; 
+  padding: 10px 10px; 
 }
 </style>

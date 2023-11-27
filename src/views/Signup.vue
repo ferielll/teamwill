@@ -28,42 +28,25 @@
                       <br />
                       first onboarding experience
                     </h6>
-                    <v-alert class="alert alert-danger" v-if="error">{{ error }}</v-alert>
                     <v-row align="center" justify="center">
                       <v-col cols="12" sm="8">
-                        <v-row>
-                          <v-col cols="12" sm="6">
                             <v-text-field
-                              label="First Name"
+                              label="Name"
                               outlined
                               dense
                               color="blue"
                               autocomplete="false"
                               class="mt-4"
-                              required
+                              v-model="data.name"
                             />
-                          </v-col>
-                          <v-col cols="12" sm="6">
-                            <v-text-field
-                              label="Last Name"
-                              outlined
-                              dense
-                              color="blue"
-                              autocomplete="false"
-                              class="mt-4"
-                              required
-                            />
-                          </v-col>
-                        </v-row>
                         <v-text-field
                           label="Email"
                           outlined
                           dense
                           color="blue"
                           autocomplete="false"
-                          v-model="email"
+                          v-model="data.email"
                         />
-                        <div class="error" v-if="errors.email">{{ errors.email }}</div>
                         <v-text-field
                           label="Password"
                           outlined
@@ -71,9 +54,8 @@
                           color="blue"
                           autocomplete="false"
                           type="password"
-                          v-model="password"
+                          v-model="data.password"
                         />
-                        <div class="error" v-if="errors.password">{{ errors.password }}</div>
                         <v-row>
                           <v-col cols="12" sm="7">
                             <v-checkbox
@@ -89,7 +71,7 @@
                             >
                           </v-col>
                         </v-row>
-                        <v-btn color="blue" dark block tile @click="onSignup()">Sign up</v-btn>
+                        <v-btn color="blue" dark block tile @click="submit()">Sign up</v-btn>
                       </v-col>
                     </v-row>
                   </v-card-text>
@@ -103,72 +85,46 @@
   </v-container>
 </template>
 
-<script>
-import {
-  LOADING_SPINNER_SHOW_MUTATION,
-  SIGNUP_ACTION,
-} from "@/store/storeconstants";
-import { mapActions, mapMutations } from "vuex";
-import SignupValidations from "../services/SignupValidations";
+<script lang="ts">
+import {reactive} from 'vue';
+import { useRouter } from 'vue-router';
+
 export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-      errors: [],
-      error: "",
-      firstName: "",
-      lastName:"",
-    };
-  },
-  methods: {
-    ...mapActions("auth", {
-      signup: SIGNUP_ACTION,
-    }),
-    ...mapMutations({
-      showLoading: LOADING_SPINNER_SHOW_MUTATION,
-    }),
-    async onSignup() {
-      let validations = new SignupValidations(this.email, this.password);
+  name: "Register",
+  setup() {
+    const data = reactive({
+      name: '',
+      email: '',
+      password: ''
+    });
+const router = useRouter();
+    const submit = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-      this.errors = validations.checkValidations();
-      if (
-        this.errors &&
-        ("email" in this.errors || "password" in this.errors)
-      ) {
-        return false;
-      }
-      this.error = "";
-      //make spinner true
-      this.showLoading(true);
-      try {
-        const userCredential = await this.signup({ email: this.email, password: this.password });
-        console.log("user credentials: ", userCredential)
-          if (userCredential) {
-      const user = userCredential.user;
-      const userInfo = {
-        firstName: this.firstName,
-        lastName: this.lastName,
-      };
-
-      await addDoc(collection(db, 'users'), {
-        userId: user.uid,
-        ...userInfo,
-      });
-
-      this.$router.push('/dashboard');
-    } else {
-      console.error('User registration failed.');
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-      } catch (e) {
-        this.error = e;
-        this.showLoading(false);
-      }
-      //make spinner false
-      this.showLoading(false);
-    },
-  },
+
+    // Process the response as needed
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+  await router.push('/')
 };
+
+
+    return {
+      data,
+      submit
+    }
+    
+  },
+}
 </script>
 
 <style scoped>

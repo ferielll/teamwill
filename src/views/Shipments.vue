@@ -10,21 +10,48 @@
             Go Back
           </v-btn>
         </v-subheader>
-        <v-col cols="12" sm="7">
-          <v-card elevation="4" class="rounded-lg">
-            <v-card-title
-              style="font-weight: bold; font-size: 30px; color: #2f4f4f"
-              >Analytics</v-card-title
-            >
-            <div style="width: 500px">
-              <canvas id="acquisitions"></canvas>
-            </div>
-          </v-card>
-        </v-col>
+        <v-row>
+          <v-col cols="12" sm="4">
+            <v-card elevation="4" class="rounded-lg">
+              <v-card-title
+                style="font-weight: bold; font-size: 30px; color: #2f4f4f"
+                >Analytics</v-card-title
+              >
+              <div style="width: 500px">
+                <canvas id="acquisitions"></canvas>
+              </div>
+            </v-card>
+          </v-col>
+          <v-col lg="8" cols="10" class="py-4">
+            <v-card elevation="4" class="rounded-lg">
+              <v-card-title
+                style="font-weight: bold; font-size: 30px; color: #2f4f4f"
+                >Shippers</v-card-title
+              >
+              <div  style="width: 100%">
+                <canvas id="acquisition"></canvas>
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
         <br />
         <v-row class="mt-n6">
           <v-col cols="12" sm="12">
             <v-card elevation="4" class="rounded-lg">
+              <v-toolbar flat class="mt-n2">
+                <v-toolbar-title style="font-weight: bold; font-size: 20px"
+                  >Recent Activity</v-toolbar-title
+                >
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="success"
+                  class="rounded-lg"
+                  style="font-weight: bold"
+                  :to="{ name: 'Customers' }"
+                >
+                  View All
+                </v-btn>
+              </v-toolbar>
               <v-data-table class="grey lighten-3 py-4">
                 <template v-slot:default>
                   <tbody>
@@ -107,7 +134,7 @@ export default {
           status: "Pending",
           customer: "Aria",
           customer_id: "ZERFT 7845",
-          color: "#66CDAA",
+          color: "grey",
         },
         {
           product: "#74123-96",
@@ -168,13 +195,38 @@ export default {
         datasets: [
           {
             label: "Shipments Overview",
-            data: [300, 50, 100],
+            data: [300, 100, 50],
             backgroundColor: [
               "rgb(255, 99, 132)",
               "rgb(54, 162, 235)",
               "rgb(255, 205, 86)",
             ],
-            hoverOffset: 4,
+            hoverOffset: 1,
+          },
+        ],
+      },
+    });
+    const chart2 = new Chart(document.getElementById("acquisition"), {
+       type: "bar",
+      data: {
+        labels: ["JNE", "DHL", "RedX", "Amazon"],
+        datasets: [
+          {
+            label: "Shipper Productivty",
+            data: [10, 40, 60, 90],
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(255, 159, 64, 0.2)",
+              "rgba(255, 205, 86, 0.2)",
+              "rgba(75, 192, 192, 0.2)",
+            ],
+            borderColor: [
+              "rgb(255, 99, 132)",
+              "rgb(255, 159, 64)",
+              "rgb(255, 205, 86)",
+              "rgb(75, 192, 192)",
+            ],
+            borderWidth: 1,
           },
         ],
       },
